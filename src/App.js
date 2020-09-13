@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState, useMemo} from 'react';
 import './App.css';
+import TodoList from './components/TodoList';
+import TodoForm from './components/TodoForm';
+import TodoFilter from './components/TodoFilter';
+
+import useTodo from './hooks/useTodo';
 
 function App() {
+  const{ todos, toggleTodo, deleteTodo, addTodo } = useTodo();
+  const[filter, setFilter] = useState('all');
+  const handleFilter = event => {
+    setFilter(event.target.value);
+  };
+
+  const filteredTodos = useMemo(() => {
+    switch (filter) {
+      case'active':
+        return todos.filter(todo => !todo.completed);
+      case'completed':
+        return todos.filter(todo => todo.completed);
+      case'all':
+      default:
+        return todos;
+    }
+  }, [todos, filter]);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Todo List</h1>
+      <TodoFilter selectedFilter={filter} handleFilter={handleFilter}/>
+      <TodoForm  addTodo={addTodo}/>
+      <TodoList todos={filteredTodos} toggleTodo={toggleTodo} deleteTodo={deleteTodo}/>
     </div>
   );
 }
